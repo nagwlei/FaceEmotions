@@ -1,0 +1,16 @@
+# Ignore the files from MatConvNet
+doc/
+examples/
+matconvnet.xcodeproj/
+matlab/
+utils/
+
+.gitattributes
+.gitmodules
+CONTRIBUTING.md
+COPYING
+Makefile
+matconvnet.sln
+matconvnet.vcxproj
+matconvnet.vcxproj.filters
+README_matconvnet.md
