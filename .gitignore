@@ -14,3 +14,7 @@ matconvnet.sln
 matconvnet.vcxproj
 matconvnet.vcxproj.filters
 README_matconvnet.md
+
+# Ignore the files of all the data from the images
+ImageData/
+Results/
