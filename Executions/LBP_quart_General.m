@@ -1,6 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Inputs:
 % -faces: 
+% -newfaces: structure containing the half and the quarter iamges
 % -images: Structure containing the images in .data(:,:,:,j) and the labels
 %   of the images in .labels
 % -nneighStart: Start of the number of neighbours for the table
@@ -11,33 +12,42 @@
 % -nFolds: The number of folds to do the CrossValidation
 
 % Output:
-% -myMatrixLBP: Table with the LBP with the given number of neighbours and
+% -myMatrixLBPquart: Table with the LBP with the given number of neighbours and
 %   radius (the rows are the radius and the columns are the number of
 %   neighbours).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function myMatrixLBP = LBP_General(faces, images, nneighStart, nneighEnd, rStart, rEnd, nfolds)
+
+function myMatrixLBPquart = LBP_quart_General(faces, newfaces, images, nneighStart, nneighEnd, rStart, rEnd, nfolds)
     % LBPx: nneighbours
     % LBPy: Radius
-    
+
     nneighbours = nneighStart;
     radius = rStart;
-    
-    
-    for zx = 1:((rEnd - rStart)+1)
-        for zy = 1:((nneighEnd - nneighStart)+1)
+
+    myMatrixLBPquart = zeros((nneighEnd - nneighStart)+1, (rEnd - rStart)+1);
+
+     for zx = 1:((rEnd - rStart)+1)
+         for zy = 1:((nneighEnd - nneighStart)+1)
             % Extract LBP features
             for i=1:length(faces)
+                %i;
+                % Obtain selected image
                 img = images.data(:,:,:,i);
                 % Extract LBP features
                 lbpimg = extractLBPFeatures(rgb2gray(uint8(img)),'Upright',false, 'CellSize', [16 16], 'NumNeighbors',nneighbours,'Radius',radius);
-                faces{i}.LBP = lbpimg;
+                half = newfaces{i}.half;
+                lbphalfimg = extractLBPFeatures(rgb2gray(uint8(half)),'Upright',false, 'CellSize', [16 16], 'NumNeighbors',nneighbours,'Radius',radius);
+                quart = newfaces{i}.quarter;
+                lbpquartimg = extractLBPFeatures(rgb2gray(uint8(quart)),'Upright',false, 'CellSize', [16 16], 'NumNeighbors',nneighbours,'Radius',radius);
+                finallbp = horzcat(lbpimg, lbphalfimg, lbpquartimg);
+                faces{i}.LBP = finallbp;
             end;
-            
+
             % Create the folds
-            CVO = cvpartition(images.labels, 'k', nfolds);
+            CVO = cvpartition(images.labels, 'k', 5);
             %CVO = cvpartition(images.labels, 'k', 10);
             errLBP = zeros(CVO.NumTestSets, 1);
-            
+
             for i = 1:CVO.NumTestSets
                 TrLBP = [];
                 TsLBP = [];
@@ -55,17 +65,20 @@ function myMatrixLBP = LBP_General(faces, images, nneighStart, nneighEnd, rStart
                         TrLBP = vertcat(TrLBP, faces{j}.LBP);
                     end;
                 end;
-    
+
+
                 Mdl = fitcecoc(TrLBP, images.labels(trIdx));
                 ytestLBP = predict(Mdl, TsLBP);
 
                 errLBP(i) = sum(ytestLBP~=images.labels(teIdx)');
             end;
-            
+
             cvErrLBP = sum(errLBP)/sum(CVO.TestSize);
-            
-            myMatrixLBP(zy, zx) = cvErrLBP;
-            
+
+
+            myMatrixLBPquart(zy, zx) = cvErrLBP;
+
+
             disp(strcat('VUELTA                zx:', int2str(zx), '    zy:', int2str(zy)))
             %disp(strcat('VALORRRRRRR                :    ', sprintf('%f', cvErrHOG)))
             disp(strcat('VALOR             LBP:    ', sprintf('%f', cvErrLBP)))

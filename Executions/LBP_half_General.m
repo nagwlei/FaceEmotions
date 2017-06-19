@@ -17,7 +17,7 @@
 %   neighbours).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function mymatrixLBPhalf = LBP_half_General(faces, newfaces, images, nneighStart, nneighEnd, rStart, rEnd, nfolds)
+function myMatrixLBPhalf = LBP_half_General(faces, newfaces, images, nneighStart, nneighEnd, rStart, rEnd, nfolds)
     % LBPx: nneighbours
     % LBPy: Radius
 
@@ -84,7 +84,7 @@ function mymatrixLBPhalf = LBP_half_General(faces, newfaces, images, nneighStart
             nneighbours = nneighbours + 2^(zy);
             disp(strcat('CellSize  after     :', int2str(nneighbours)));
         end;
-        nneighbours = 2;
+        nneighbours = nneighStart;
         radius = radius +1;
     end;
 end
