@@ -19,3 +19,7 @@ README_matconvnet.md
 ImageData/
 NNData/
 Results/
+
+# Ignore taken code from the University of Oulu
+bsif_code_and_data/
+Blanca_Media_min_y_max.m

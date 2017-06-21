@@ -10,6 +10,7 @@ load('ImageData\imdb.mat');
 
 
 
+addpath('Executions');
 %%%%%%%%%%%%%%%MISSING OTHER FUNCTIONS %%%%%%%%%%%%%%%%%%%%%
 % LBP
 myMatrixLBP = LBP_General(faces, images, 2, 6, 2, 7, 5);
@@ -25,9 +26,11 @@ myMatrixLBPPyramid = LBP_of_pyramid_General(5, 16, faces, images, 2, 6, 2, 7, 5)
 %% Executions with cropped and centered images
 load('ImageData\centimdb.mat');
 
-addpath('Executions');
 
-myMatrixHOGcent = HOG_General(faces, centimages, 6, 19, 6, 25, 5);
+%myMatrixHOGcent = HOG_General(faces, centimages, 6, 19, 6, 25, 5);
+myMatrixHOGcent = HOG_General(faces, centimages, 6, 19, 6, 15, 5);
+myMatrixHOGcent = HOG_General(faces, centimages, 6, 19, 16, 25, 5);
+
 
 %myMatrixLBPcent = LBP_General(faces, centimages, 2, 6, 2, 8, 5);
 %myMatrixLBPcent = LBP_General(faces, centimages, 2, 6, 2, 6, 5);
@@ -46,4 +49,8 @@ myMatrixLBPcent_quart = LBP_quart_General(faces, newfaces, centimages, 2, 6, 2, 
 
 myMatrixLBPcentPyramid = LBP_of_pyramid_General(5, 16, faces, centimages, 2, 6, 2, 7, 5);
 
+addpath('bsif_code_and_data');
+addpath('bsif_code_and_data\texturefilters');
 
+myMatrixBSIF = BSIF_General(faces, centimages, 3, 3, 5, 8, 5);
+myMatrixBSIF = BSIF_General(faces, images, 5, 12, 5, 12, 5);
