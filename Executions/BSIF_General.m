@@ -5,7 +5,7 @@
 % http://www.ee.oulu.fi/~jkannala/bsif/bsif.html
 
 
-% Inputs:
+% Inputs:   
 % -faces: 
 % -images: Structure containing the images in .data(:,:,:,j) and the labels
 %   of the images in .labels
@@ -32,7 +32,7 @@ function myMatrixBSIF = BSIF_General(faces, images, fSizeStart, fSizeEnd, bitSta
          for zy = 1:((fSizeEnd - fSizeStart)+1)
             % Extract BSIF features
             for i=1:length(faces)
-                disp(strcat('i: ', int2str(i)));
+                %disp(strcat('i: ', int2str(i)));
                 % Obtain selected image
                 img = images.data(:,:,:,i);
                 % Extract BSIF features
