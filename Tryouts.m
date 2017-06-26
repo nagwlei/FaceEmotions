@@ -5,40 +5,71 @@ run matlab/vl_compilenn
 run matlab/vl_setupnn
 
 % Load image data
-load('ImageData\myfaces.mat');
-load('ImageData\imdb.mat');
+f = filesep;
+load(strcat('ImageData', f, 'myfaces.mat'));
+load(strcat('ImageData', f, 'imdb.mat'));
+
+% Add paths to execute the tests
+addpath('Executions');
+addpath('Pyramid');
+addpath('bsif_code_and_data');
+addpath(strcat('bsif_code_and_data', f, 'texturefilters'));
+
+nfolds = 5;
 
 
- bgt6addpath('Executions');
-%%%%%%%%%%%%%%%MISSING OTHER FUNCTIONS %%%%%%%%%%%%%%%%%%%%%
+%% Execution with the original images
+
+% Create the partitions
+CVO = cvpartition(images.labels, 'k', nfolds);
+
+myMatrixHOG = HOG_General(faces, images, 6, 19, 6, 15, CVO);
+
 % LBP
-myMatrixLBP = LBP_General(faces, images, 2, 6, 2, 7, 5);
+myMatrixLBP = LBP_General(faces, images, 2, 6, 2, 7, CVO);
 
+% Create the half and quart images and concatenate them
+newfaces = resize_half_and_quart(faces, images);
+
+% LBP of concatenation of image and half image
+myMatrixLBP_half = LBP_half_General(faces, newfaces, centimages, 2, 6, 2, 7, CVO);
+
+% LBP of concatenation of image, half image and quarter image
+myMatrixLBP_quart = LBP_quart_General(faces, newfaces, centimages, 2, 6, 2, 7, CVO);
 
 % Execution of LBP Pyramid
-addpath('Pyramid');
-myMatrixLBPPyramid = LBP_of_pyramid_General(5, 16, faces, images, 2, 6, 2, 7, 5);
+myMatrixLBPPyramid = LBP_of_pyramid_General(5, 16, faces, images, 2, 6, 2, 7, CVO);
 
+% BSIF
+% This has to be done on 2 steps because the 3x3 filters have less bits
+myMatrixBSIF = BSIF_General(faces, images, 3, 3, 5, 8, CVO);
+myMatrixBSIF2 = BSIF_General(faces, images, 5, 11, 5, 12, CVO);
 
 %% Executions with cropped and centered images
-load('ImageData\centimdb.mat');
+load(strcat('ImageData', f, 'centimdb.mat'));
 
-myMatrixHOGcent = HOG_General(faces, centimages, 6, 19, 6, 15, 5);
-myMatrixHOGcent2 = HOG_General(faces, centimages, 6, 19, 16, 25, 5);
+% In the cropped images we use the same partitions (CVO)
 
-myMatrixLBPcent = LBP_General(faces, centimages, 2, 6, 2, 7, 5);
+%HOG
+myMatrixHOGcent = HOG_General(faces, centimages, 6, 19, 6, 15, CVO);
+myMatrixHOGcent2 = HOG_General(faces, centimages, 6, 19, 16, 25, CVO);
 
+%LBP
+myMatrixLBPcent = LBP_General(faces, centimages, 2, 6, 2, 7, CVO);
 
-newfaces = resize_half_and_quart(faces, centimages);
-myMatrixLBPcent_half = LBP_half_General(faces, newfaces, centimages, 2, 6, 2, 7, 5);
+% Create the half and quart images and concatenate them
+newfacescent = resize_half_and_quart(faces, centimages);
 
+% LBP of concatenation of image and half image
+myMatrixLBPcent_half = LBP_half_General(faces, newfacescent, centimages, 2, 6, 2, 7, CVO);
 
-myMatrixLBPcent_quart = LBP_quart_General(faces, newfaces, centimages, 2, 6, 2, 7, 5);
+% LBP of concatenation of image, half image and quarter image
+myMatrixLBPcent_quart = LBP_quart_General(faces, newfacescent, centimages, 2, 6, 2, 7, CVO);
 
-myMatrixLBPcentPyramid = LBP_of_pyramid_General(5, 16, faces, centimages, 2, 6, 2, 7, 5);
+% LBP of pyramid
+myMatrixLBPcentPyramid = LBP_of_pyramid_General(5, 16, faces, centimages, 2, 6, 2, 7, CVO);
 
-addpath('bsif_code_and_data');
-addpath('bsif_code_and_data\texturefilters');
-
-%myMatrixBSIF = BSIF_General(faces, centimages, 3, 3, 5, 8, 5);
-myMatrixBSIF = BSIF_General(faces, images, 5, 11, 5, 12, 5);
+% BSIF
+% This has to be done on 2 steps because the 3x3 filters have less bits
+myMatrixBSIFcent = BSIF_General(faces, centimages, 3, 3, 5, 8, CVO);
+myMatrixBSIFcent2 = BSIF_General(faces, centimages, 5, 11, 5, 12, CVO);

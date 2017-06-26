@@ -6,15 +6,14 @@
 
 
 % Inputs:   
-% -faces: 
+% -faces: Structure containing the emotion, etnicity, id etc.
 % -images: Structure containing the images in .data(:,:,:,j) and the labels
 %   of the images in .labels
 % -fSizeStart: Start of the sizes size
 % -fSizeEnd: fSizeStart + number of elements to work with
 % -bitStart: Start of bit sizes
 % -bitEnd: End of bit sizes
-% -nFolds: The number of folds to do the CrossValidation
-
+% -CVO: The partitions for test and train
 % Output:
 % -myMatrixBSIF: Table with the BSIF with the given number of bits and
 %   filter size (the rows are the bits and the columns are the size of the
@@ -22,7 +21,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function myMatrixBSIF = BSIF_General(faces, images, fSizeStart, fSizeEnd, bitStart, bitEnd, nfolds)
+function myMatrixBSIF = BSIF_General(faces, images, fSizeStart, fSizeEnd, bitStart, bitEnd, CVO)
     fSize = fSizeStart;
     bits = bitStart;
 
@@ -30,69 +29,61 @@ function myMatrixBSIF = BSIF_General(faces, images, fSizeStart, fSizeEnd, bitSta
 
      for zx = 1:((bitEnd - bitStart)+1)
          for zy = 1:((fSizeEnd - fSizeStart)+1)
-            % Extract BSIF features
+            % Extract BSIF features for each of the images
             for i=1:length(faces)
-                %disp(strcat('i: ', int2str(i)));
                 % Obtain selected image
                 img = images.data(:,:,:,i);
+                
                 % Extract BSIF features
-                ICAtextureFiltersdir = strcat('bsif_code_and_data\texturefilters\ICAtextureFilters_', num2str(fSize), 'x', num2str(fSize), '_', num2str(bits), 'bit');
+                f = filesep
+                ICAtextureFiltersdir = strcat('bsif_code_and_data', f, 'texturefilters', f, 'ICAtextureFilters_', ...
+                    num2str(fSize), 'x', num2str(fSize), '_', num2str(bits), 'bit');
+                
                 % normalized BSIF code word histogram
                 load(ICAtextureFiltersdir);
-                %bsifhistnnorm = bsif(double(rgb2gray(uint8(img))), ICAtextureFilters,'h');
-                %faces{i}.BSIF = bsifhistnnorm;
-                bsifhistnorm = bsif(double(rgb2gray(uint8(img))), ICAtextureFilters,'nh');
-                faces{i}.BSIF = bsifhistnorm;
-                %bsifcodeim = bsif(double(rgb2gray(uint8(img))),ICAtextureFilters,'im');
-                %bsifcodeim = reshape(bsifcodeim, [], 1);
-                %faces{i}.BSIF = bsifcodeim';
+                faces{i}.BSIF = bsif(double(rgb2gray(uint8(img))), ICAtextureFilters,'nh');
             end;
 
-            disp(ICAtextureFiltersdir);
+            disp(strcat('FILTERS      fSize:     ', num2str(fSize), 'x', num2str(fSize), ' bits: ', num2str(bits)));
             
-            % Create the folds
-            CVO = cvpartition(images.labels, 'k', nfolds);
-            %CVO = cvpartition(images.labels, 'k', 10);
             errBSIF = zeros(CVO.NumTestSets, 1);
 
             for i = 1:CVO.NumTestSets
-                disp(strcat('test i: ', int2str(i)));
-                TrBSIF = [];
-                TsBSIF = [];
-
                 trIdx = CVO.training(i);
                 teIdx = CVO.test(i);
 
+                TrBSIF = zeros(sum(trIdx), length(faces{1}.BSIF));
+                TeBSIF = zeros(sum(teIdx), length(faces{1}.BSIF));
+                
+                tr = 0;
+                te = 0;
+                                
                 for j = 1:length(faces)
-                    %j
                     if (teIdx(j)>0)
-                        %disp('IF');
-                        TsBSIF = vertcat(TsBSIF, faces{j}.BSIF);
+                        te = te + 1;
+                        TeBSIF(te,:) = faces{j}.BSIF;
                     else
-                        %disp('ELSE');
-                        TrBSIF = vertcat(TrBSIF, faces{j}.BSIF);
+                        tr = tr + 1;
+                        TrBSIF(tr,:) = faces{j}.BSIF;
                     end;
                 end;
-
-
-                Mdl = fitcecoc(TrBSIF, images.labels(trIdx));
-                ytestBSIF = predict(Mdl, TsBSIF);
+                
+                t = templateSVM( 'Standardize', 1 );
+                Mdl = fitcecoc(TrBSIF, images.labels(trIdx), 'Learners', t);
+                ytestBSIF = predict(Mdl, TeBSIF);
 
                 errBSIF(i) = sum(ytestBSIF~=images.labels(teIdx)');
             end;
 
-            cvErrBSIF = sum(errBSIF)/sum(CVO.TestSize);
+            % Introduce MAE in the matrix
+            myMatrixBSIF(zy, zx) = sum(errBSIF)/sum(CVO.TestSize);
 
-
-            myMatrixBSIF(zy, zx) = cvErrBSIF;
-
-
-            disp(strcat('VUELTA                zx:', int2str(zx), '    zy:', int2str(zy)))
-            %disp(strcat('VALORRRRRRR                :    ', sprintf('%f', cvErrHOG)))
-            disp(strcat('VALOR             BSIF:    ', sprintf('%f', cvErrBSIF)))
+            disp(strcat('MAE of       BSIF:    ', sprintf('%f', myMatrixBSIF(zy, zx))))
+            % Newline
+            disp(' ')
+            
             % Go to the next element of the table
             fSize = fSize + 2;
-            disp(strcat('CellSize  after     :', int2str(fSize)));
         end;
         fSize = fSizeStart;
         bits = bits +1;

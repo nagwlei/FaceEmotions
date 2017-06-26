@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Inputs:
-% -faces: 
+% -faces: Structure containing the emotion, etnicity, id etc.
 % -newfaces: structure containing the half and the quarter iamges
 % -images: Structure containing the images in .data(:,:,:,j) and the labels
 %   of the images in .labels
@@ -9,18 +9,15 @@
 % -rStart: Start of radius for the table
 % -rEnd: End of radius for the table (and each of the radius will be 
 %   calculated as a ^2)
-% -nFolds: The number of folds to do the CrossValidation
+% -CVO: The partitions for test and train
 
 % Output:
 % -myMatrixLBPquart: Table with the LBP with the given number of neighbours and
-%   radius (the rows are the radius and the columns are the number of
-%   neighbours).
+%   radius (the rows are the number of neighbours and the columns are 
+%   the radius).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function myMatrixLBPquart = LBP_quart_General(faces, newfaces, images, nneighStart, nneighEnd, rStart, rEnd, nfolds)
-    % LBPx: nneighbours
-    % LBPy: Radius
-
+function myMatrixLBPquart = LBP_quart_General(faces, newfaces, images, nneighStart, nneighEnd, rStart, rEnd, CVO)
     nneighbours = nneighStart;
     radius = rStart;
 
@@ -42,49 +39,48 @@ function myMatrixLBPquart = LBP_quart_General(faces, newfaces, images, nneighSta
                 finallbp = horzcat(lbpimg, lbphalfimg, lbpquartimg);
                 faces{i}.LBP = finallbp;
             end;
-
-            % Create the folds
-            CVO = cvpartition(images.labels, 'k', 5);
-            %CVO = cvpartition(images.labels, 'k', 10);
+            
+            disp(strcat('LBP          nNeighbours: ', int2str(nneighbours), ...
+                ' radius: ', int2str(radius)));
+            
             errLBP = zeros(CVO.NumTestSets, 1);
 
             for i = 1:CVO.NumTestSets
-                TrLBP = [];
-                TsLBP = [];
-
                 trIdx = CVO.training(i);
                 teIdx = CVO.test(i);
 
+                TrLBP = zeros(sum(trIdx), length(faces{1}.LBP));
+                TeLBP = zeros(sum(teIdx), length(faces{1}.LBP));
+                
+                tr = 0;
+                te = 0;
+                
                 for j = 1:length(faces)
-                    %j
                     if (teIdx(j)>0)
-                        %disp('IF');
-                        TsLBP = vertcat(TsLBP, faces{j}.LBP);
+                        te = te + 1;
+                        TeLBP(te,:) = faces{j}.LBP;
                     else
-                        %disp('ELSE');
-                        TrLBP = vertcat(TrLBP, faces{j}.LBP);
+                        tr = tr + 1;
+                        TrLBP(tr,:) = faces{j}.LBP;
                     end;
                 end;
 
-
-                Mdl = fitcecoc(TrLBP, images.labels(trIdx));
-                ytestLBP = predict(Mdl, TsLBP);
+                t = templateSVM( 'Standardize', 1 );
+                Mdl = fitcecoc(TrLBP, images.labels(trIdx), 'Learners', t);
+                ytestLBP = predict(Mdl, TeLBP);
 
                 errLBP(i) = sum(ytestLBP~=images.labels(teIdx)');
             end;
 
-            cvErrLBP = sum(errLBP)/sum(CVO.TestSize);
+            myMatrixLBPquart(zy, zx) = sum(errLBP)/sum(CVO.TestSize);
 
+            disp(strcat('MAE of       LBP:    ', sprintf('%f', myMatrixLBPquart(zy, zx))))
 
-            myMatrixLBPquart(zy, zx) = cvErrLBP;
-
-
-            disp(strcat('VUELTA                zx:', int2str(zx), '    zy:', int2str(zy)))
-            %disp(strcat('VALORRRRRRR                :    ', sprintf('%f', cvErrHOG)))
-            disp(strcat('VALOR             LBP:    ', sprintf('%f', cvErrLBP)))
+            % Newline
+            disp(' ')
+            
             % Go to the next element of the table
             nneighbours = nneighbours + 2^(zy);
-            disp(strcat('CellSize  after     :', int2str(nneighbours)));
         end;
         nneighbours = nneighStart;
         radius = radius +1;

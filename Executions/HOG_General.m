@@ -7,7 +7,7 @@
 % -cendEnd: End of the number of cells for the table
 % -nBinsStart: Start of number of bins for the table
 % -nBinsEnd: End of number of bins for the table
-% -nFolds: The number of folds to do the CrossValidation
+% -CVO: The partitions for test and train
 
 % Output:
 % -myMatrixHOG: Table with the HOG with the given number of neighbours and
@@ -15,12 +15,10 @@
 %   neighbours).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function myMatrixHOG = HOG_General(faces, images, cellStart, cellEnd, nBinsStart, nBinsEnd, nfolds)
-    %HOGx CellSize
-    %HOGy NumBins
-    
+function myMatrixHOG = HOG_General(faces, images, cellStart, cellEnd, nBinsStart, nBinsEnd, CVO)
     cellSize = cellStart;
     nBins = nBinsStart;
+    
     myMatrixHOG = zeros((cellEnd - cellStart)+1, (nBinsEnd - nBinsStart)+1);
  
     for zx = 1:((nBinsEnd - nBinsStart)+1)
@@ -34,42 +32,48 @@ function myMatrixHOG = HOG_General(faces, images, cellStart, cellEnd, nBinsStart
                 [featureVector,hogVisualization] = extractHOGFeatures(img, 'CellSize', [cellSize cellSize], 'NumBins', nBins);
                 faces{i}.HOG = featureVector;
             end;
-
-            % Create the folds
-            CVO = cvpartition(images.labels, 'k', nfolds);
-            %CVO = cvpartition(images.labels, 'k', 10);
-            %CVO = cvpartition(images.set, 'k', 7);
+            
+            disp(strcat('HOG          cellSize: ', int2str(cellSize), ...
+                'x', int2str(cellSize), ' nBins: ', int2str(nBins)));
+            
             errHOG = zeros(CVO.NumTestSets, 1);
 
             for i = 1:CVO.NumTestSets
-                TrHOG = [];
-                TsHOG = [];
                 trIdx = CVO.training(i);
                 teIdx = CVO.test(i);
 
+                TrHOG = zeros(sum(trIdx), length(faces{1}.HOG));
+                TeHOG = zeros(sum(teIdx), length(faces{1}.HOG));
+                
+                tr = 0;
+                te = 0;
+                
                 for j = 1:length(faces)
-                    %j
                     if (teIdx(j)>0)
-                        %disp('IF');
-                        TsHOG = vertcat(TsHOG, faces{j}.HOG);
+                        te = te + 1;
+                        TeHOG(te,:) = faces{j}.HOG;
                     else
-                        %disp('ELSE');
-                        TrHOG = vertcat(TrHOG, faces{j}.HOG);
+                        tr = tr + 1;
+                        TrHOG(tr,:) = faces{j}.HOG;
                     end;
                 end;
 
-                Mdl2 = fitcecoc(TrHOG, images.labels(trIdx));
-                ytestHOG = predict(Mdl2, TsHOG);
+                t = templateSVM( 'Standardize', 1 );
+                Mdl = fitcecoc(TrHOG, images.labels(trIdx), 'Learners', t);
+                ytestHOG = predict(Mdl, TeHOG);
 
                 errHOG(i) = sum(ytestHOG~=images.labels(teIdx)');
 
             end;
-            cvErrHOG = sum(errHOG)/sum(CVO.TestSize);
 
-            myMatrixHOG(zx, zy) = cvErrHOG; 
+            % Calculate MAE
+            myMatrixHOG(zx, zy) = sum(errHOG)/sum(CVO.TestSize);
 
-            disp(strcat('VUELTAAAAAAA                zx:', int2str(zx), '    zy:', int2str(zy)))
-            disp(strcat('VALORRRRRRR                :    ', sprintf('%f', cvErrHOG)))
+            disp(strcat('MAE of       HOG:    ', sprintf('%f', myMatrixHOG(zy, zx))))
+            
+            % Newline
+            disp(' ')
+            
             % Go to the next element of the table
             cellSize = cellSize + 1;
         end;

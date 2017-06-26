@@ -10,7 +10,7 @@
 % -rStart: Start of radius for the table
 % -rEnd: End of radius for the table (and each of the radius will be 
 %   calculated as a ^2)
-% -nFolds: The number of folds to do the CrossValidation
+% -CVO: The partitions for test and train
 
 % Output:
 % -myMatrixLBPPyramid: Table with the LBP with the given number of neighbours and
@@ -18,70 +18,70 @@
 %   neighbours).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function myMatrixLBPPyramid = LBP_of_pyramid_General(nlevels, blocksize, faces, images, nneighStart, nneighEnd, rStart, rEnd, nfolds)
-    LBPx = nneighStart;
-    LBPy = rStart;
+function myMatrixLBPPyramid = LBP_of_pyramid_General(nlevels, blocksize, faces, images, nneighStart, nneighEnd, rStart, rEnd, CVO)
+    nneighbours = nneighStart;
+    radius = rStart;
     
     myMatrixLBPPyramid = zeros((nneighEnd - nneighStart)+1, (rEnd - rStart)+1); 
 
     myfaces = faces;
     for zx = 1:((rEnd - rStart)+1)
-        for zy = 1:((nneighEnd - nneighStart)+1)
-            disp(strcat('zy: ', int2str(zy)));
+        for zy = 1:((nneighEnd - nneighStart)+1)         
+            disp(strcat('LBP pyramid  nNeighbours: ', int2str(nneighbours), ...
+                ' radius: ', int2str(radius)));
+            
             for i=1:length(myfaces)
                 %i
                 % Obtain selected image
                 img = images.data(:,:,:,i); 
                 % Extract LBP features
                 levels = pyramid_levels(nlevels, blocksize, img);
-                lbpimg = LBP_of_pyramid(levels, LBPx, LBPy);
-                %lbpimg = extractLBPFeatures(rgb2gray(uint8(img)),'Upright',false, 'CellSize', [16 16], 'NumNeighbors',LBPx,'Radius',LBPy);
+                lbpimg = LBP_of_pyramid(levels, nneighbours, radius);
+
                 myfaces{i}.LBP = lbpimg;
             end;
             
-            % Create the folds
-            CVO = cvpartition(images.labels, 'k', nfolds);
-            %CVO = cvpartition(images.labels, 'k', 10);
             errLBP = zeros(CVO.NumTestSets, 1);
             
             for i = 1:CVO.NumTestSets
-                TrLBP = [];
-                TsLBP = [];
-
                 trIdx = CVO.training(i);
                 teIdx = CVO.test(i);
+                
+                TrLBP = zeros(sum(trIdx), length(myfaces{1}.LBP));
+                TeLBP = zeros(sum(teIdx), length(myfaces{1}.LBP));
+                
+                tr = 0;
+                te = 0;
     
                 for j = 1:length(myfaces)
-                    %j
                     if (teIdx(j)>0)
-                        %disp('IF');
-                        TsLBP = vertcat(TsLBP, myfaces{j}.LBP);
+                        te = te + 1;
+                        TeLBP(te,:) = myfaces{j}.LBP;
                     else
-                        %disp('ELSE');
-                        TrLBP = vertcat(TrLBP, myfaces{j}.LBP);
+                        tr = tr + 1;
+                        TrLBP(tr,:) = myfaces{j}.LBP;
                     end;
                 end;
     
-    
-                Mdl = fitcecoc(TrLBP, images.labels(trIdx));
-                ytestLBP = predict(Mdl, TsLBP);
+                t = templateSVM( 'Standardize', 1 );
+                Mdl = fitcecoc(TrLBP, images.labels(trIdx), 'Learners', t);
+                ytestLBP = predict(Mdl, TeLBP);
     
                 errLBP(i) = sum(ytestLBP~=images.labels(teIdx)');
             end;
             
             % Calculate MAE
-            cvErrLBP = sum(errLBP)/sum(CVO.TestSize);
-        
-            myMatrixLBPPyramid(zy, zx) = cvErrLBP;
-        
-            disp(strcat('VUELTA                zx:', int2str(zx), '    zy:', int2str(zy)))
-            %disp(strcat('VALORRRRRRR                :    ', sprintf('%f', cvErrHOG)))
-            disp(strcat('VALOR             LBP:    ', sprintf('%f', cvErrLBP)))
+            myMatrixLBPPyramid(zy, zx) = sum(errLBP)/sum(CVO.TestSize);
+            
+            disp(strcat('MAE of       LBP:    ', sprintf('%f', myMatrixLBPPyramid(zy, zx))))
+            
+            % Newline
+            disp(' ')
+            
             % Go to the next element of the table
-            LBPx = LBPx + 2^(zy);
-            disp(strcat('CellSize  after     :', int2str(LBPx)));
+            nneighbours = nneighbours + 2^(zy);
         end;
-        LBPx = nneighStart;
-        LBPy = LBPy +1;
+        nneighbours = nneighStart;
+        radius = radius +1;
     end;
 end
