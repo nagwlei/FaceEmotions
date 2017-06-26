@@ -5,8 +5,8 @@ run matlab/vl_compilenn
 run matlab/vl_setupnn
 
 % Load image data
-load('ImageData\myfaces.mat');
-load('ImageData\imdb.mat');
+load('ImageData/myfaces.mat');
+load('ImageData/imdb.mat');
 
 
 

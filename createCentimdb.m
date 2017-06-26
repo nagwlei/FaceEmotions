@@ -1,6 +1,6 @@
 centimages.data = single(zeros(224, 224, 3, length(faces)));
 
-dir = '../IMAGENES_CENTRADAS/crop2/';
+dir = '/home/iarganda/data/CAFE/crop2/';
 
 for kk=1:length(faces)
     kk
