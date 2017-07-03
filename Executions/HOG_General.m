@@ -67,7 +67,7 @@ function myMatrixHOG = HOG_General(faces, images, cellStart, cellEnd, nBinsStart
             end;
 
             % Calculate MAE
-            myMatrixHOG(zx, zy) = sum(errHOG)/sum(CVO.TestSize);
+            myMatrixHOG(zy, zx) = sum(errHOG)/sum(CVO.TestSize);
 
             disp(strcat('MAE of       HOG:    ', sprintf('%f', myMatrixHOG(zy, zx))))
             

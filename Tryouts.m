@@ -23,7 +23,7 @@ nfolds = 5;
 % Create the partitions
 CVO = cvpartition(images.labels, 'k', nfolds);
 
-myMatrixHOG = HOG_General(faces, images, 6, 19, 6, 15, CVO);
+myMatrixHOG = HOG_General(faces, images, 6, 19, 6, 25, CVO);
 
 % LBP
 myMatrixLBP = LBP_General(faces, images, 2, 6, 2, 7, CVO);
@@ -51,8 +51,7 @@ load(strcat('ImageData', f, 'centimdb.mat'));
 % In the cropped images we use the same partitions (CVO)
 
 %HOG
-myMatrixHOGcent = HOG_General(faces, centimages, 6, 19, 6, 15, CVO);
-myMatrixHOGcent2 = HOG_General(faces, centimages, 6, 19, 16, 25, CVO);
+myMatrixHOGcent = HOG_General(faces, centimages, 6, 19, 6, 25, CVO);
 
 %LBP
 myMatrixLBPcent = LBP_General(faces, centimages, 2, 6, 2, 7, CVO);
