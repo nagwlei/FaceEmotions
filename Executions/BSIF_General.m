@@ -35,7 +35,7 @@ function myMatrixBSIF = BSIF_General(faces, images, fSizeStart, fSizeEnd, bitSta
                 img = images.data(:,:,:,i);
                 
                 % Extract BSIF features
-                f = filesep
+                f = filesep;
                 ICAtextureFiltersdir = strcat('bsif_code_and_data', f, 'texturefilters', f, 'ICAtextureFilters_', ...
                     num2str(fSize), 'x', num2str(fSize), '_', num2str(bits), 'bit');
                 

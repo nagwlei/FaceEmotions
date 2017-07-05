@@ -32,10 +32,10 @@ myMatrixLBP = LBP_General(faces, images, 2, 6, 2, 7, CVO);
 newfaces = resize_half_and_quart(faces, images);
 
 % LBP of concatenation of image and half image
-myMatrixLBP_half = LBP_half_General(faces, newfaces, centimages, 2, 6, 2, 7, CVO);
+myMatrixLBP_half = LBP_half_General(faces, newfaces, images, 2, 6, 2, 7, CVO);
 
 % LBP of concatenation of image, half image and quarter image
-myMatrixLBP_quart = LBP_quart_General(faces, newfaces, centimages, 2, 6, 2, 7, CVO);
+myMatrixLBP_quart = LBP_quart_General(faces, newfaces, images, 2, 6, 2, 7, CVO);
 
 % Execution of LBP Pyramid
 myMatrixLBPPyramid = LBP_of_pyramid_General(5, 16, faces, images, 2, 6, 2, 7, CVO);
