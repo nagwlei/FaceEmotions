@@ -19,7 +19,9 @@ README_matconvnet.md
 ImageData/
 NNData/
 Results/
+jaffe/
 
-# Ignore taken code from the University of Oulu
+# Ignore taken code fr  om the University of Oulu
 bsif_code_and_data/
 Blanca_Media_min_y_max.m
+jaffeimdb.mat

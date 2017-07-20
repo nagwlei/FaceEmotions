@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Inputs:
 % -faces: Structure containing the emotion, etnicity, id etc.
-% -newfaces: structure containing the half and the quarter iamges
+% -newfaces: structure containing the half and the quarter images
 % -images: Structure containing the images in .data(:,:,:,j) and the labels
 %   of the images in .labels
 % -nneighStart: Start of the number of neighbours for the table

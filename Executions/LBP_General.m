@@ -4,10 +4,10 @@
 % -images: Structure containing the images in .data(:,:,:,j) and the labels
 %   of the images in .labels
 % -nneighStart: Start of the number of neighbours for the table
-% -nneighEnd: End of the number of neighbours for the table
+% -nneighEnd: End of the number of neighbours for the table  (and each of 
+%   the neighbours will be calculated as a ^2)
 % -rStart: Start of radius for the table
-% -rEnd: End of radius for the table (and each of the radius will be 
-%   calculated as a ^2)
+% -rEnd: End of radius for the table
 % -CVO: The partitions for test and train
 
 % Output:
