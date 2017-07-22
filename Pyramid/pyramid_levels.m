@@ -22,7 +22,7 @@ function levels = pyramid_levels(nlevels, blocksize, image)
         end;
         
         % Images need to be in grayscale for mat2cell (and LBP too)
-        gray = rgb2gray(uint8(newimage));
+        gray = newimage;
         C = mat2cell(gray, x, x);
         % Output variable containing in each cell a set of cells with the
         % subimages

@@ -18,7 +18,8 @@
 %   neighbours).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function myMatrixLBPPyramid = LBP_of_pyramid_General(nlevels, blocksize, faces, images, nneighStart, nneighEnd, rStart, rEnd, CVO)
+function myMatrixLBPPyramid = LBP_of_pyramid_General(nlevels, blocksize, ...
+    faces, images, nneighStart, nneighEnd, rStart, rEnd, CVO)
     nneighbours = nneighStart;
     radius = rStart;
     
@@ -33,7 +34,16 @@ function myMatrixLBPPyramid = LBP_of_pyramid_General(nlevels, blocksize, faces, 
             for i=1:length(myfaces)
                 %i
                 % Obtain selected image
-                img = images.data(:,:,:,i); 
+                if (length(size(images.data))>3)
+                    % Color images
+                    aux = images.data(:,:,:,i);
+                    img = rgb2gray(uint8(aux));
+                else
+                    % Grayscale images
+                    aux = images.data(:,:,i);
+                    img = uint8(aux);
+                end
+                
                 % Extract LBP features
                 levels = pyramid_levels(nlevels, blocksize, img);
                 lbpimg = LBP_of_pyramid(levels, nneighbours, radius);

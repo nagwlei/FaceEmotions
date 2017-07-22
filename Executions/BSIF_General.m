@@ -21,7 +21,8 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function myMatrixBSIF = BSIF_General(faces, images, fSizeStart, fSizeEnd, bitStart, bitEnd, CVO)
+function myMatrixBSIF = BSIF_General(faces, images, fSizeStart, fSizeEnd, ...
+    bitStart, bitEnd, CVO)
     fSize = fSizeStart;
     bits = bitStart;
 
@@ -32,19 +33,27 @@ function myMatrixBSIF = BSIF_General(faces, images, fSizeStart, fSizeEnd, bitSta
             % Extract BSIF features for each of the images
             for i=1:length(faces)
                 % Obtain selected image
-                img = images.data(:,:,:,i);
+                if (length(size(images.data))>3)
+                    aux = images.data(:,:,:,i);
+                    img = rgb2gray(uint8(aux));
+                else
+                    aux = images.data(:,:,i);
+                    img = uint8(aux);
+                end
                 
                 % Extract BSIF features
                 f = filesep;
-                ICAtextureFiltersdir = strcat('bsif_code_and_data', f, 'texturefilters', f, 'ICAtextureFilters_', ...
+                ICAtextureFiltersdir = strcat('bsif_code_and_data', f, ...
+                    'texturefilters', f, 'ICAtextureFilters_', ...
                     num2str(fSize), 'x', num2str(fSize), '_', num2str(bits), 'bit');
                 
                 % normalized BSIF code word histogram
                 load(ICAtextureFiltersdir);
-                faces{i}.BSIF = bsif(double(rgb2gray(uint8(img))), ICAtextureFilters,'nh');
+                faces{i}.BSIF = bsif(double(img), ICAtextureFilters,'nh');
             end;
 
-            disp(strcat('FILTERS      fSize:     ', num2str(fSize), 'x', num2str(fSize), ' bits: ', num2str(bits)));
+            disp(strcat('FILTERS      fSize:     ', num2str(fSize), 'x', ...
+                num2str(fSize), ' bits: ', num2str(bits)));
             
             errBSIF = zeros(CVO.NumTestSets, 1);
 
