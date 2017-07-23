@@ -31,7 +31,7 @@ function myMatrixLBPhalf = LBP_half_General(faces, newfaces, images, nneighStart
                 % Obtain selected image
                 if (length(size(images.data))>3)
                     aux = images.data(:,:,:,i);
-                    img = uint8(rgb2gray(uint(aux)));
+                    img = rgb2gray(uint8(aux));
                     half = rgb2gray(uint8(newfaces{i}.half));
                 else
                     aux = images.data(:,:,i);

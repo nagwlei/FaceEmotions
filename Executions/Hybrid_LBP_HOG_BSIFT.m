@@ -5,16 +5,16 @@ function HybridMAE = Hybrid_LBP_HOG_BSIFT(faces, images, resultsLBP, ...
     BSIFfSizeStart,BSIFbitsStart, resultsBSIF, resultsBSIF2, CVO)
 
     minLBP = min(min(resultsLBP));
-    [LBPnNeighs, LBPradius] = find(resultsLBP == minLBP);
+    [LBPnNeighs, LBPradius] = find(resultsLBP == minLBP(1));
     minHOG = min(min(resultsHOG));
-    [HOGcells, HOGnBinds] = find(resultsHOG == minHOG);
+    [HOGcells, HOGnBinds] = find(resultsHOG == minHOG(1));
     minBSIF = min(min(resultsBSIF));
     minBSIF2 = min(resultsBSIF2);
     if (minBSIF<minBSIF2)
-        [BSIFfSize, BSIFbits] = find(resultsBSIF == minBSIF);
+        [BSIFfSize, BSIFbits] = find(resultsBSIF == minBSIF(1));
     else
         BSIFfSize = 3;
-        BSIFbits = find(resultsBSIF2 == minBSIF2);
+        BSIFbits = find(resultsBSIF2 == minBSIF2(1));
     end
     
     LBPnNeighs = LBPnNeighs(1);

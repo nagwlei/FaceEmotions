@@ -7,10 +7,10 @@ function HybridMAE = Hybrid_LBP_HOG_BSIFT_Pyramid(faces, newfaces, ...
 
     LBPbest = zeros(1, 4);
     
-    LBPbest(1) = min(min(resultsLBP));
-    LBPbest(2) = min(min(resultsLBP_half));
-    LBPbest(3) = min(min(resultsLBP_quart));
-    LBPbest(4) = min(min(resultsLBP_pyramid));
+    LBPbest(1) = unique(min(min(resultsLBP)));
+    LBPbest(2) = unique(min(min(resultsLBP_half)));
+    LBPbest(3) = unique(min(min(resultsLBP_quart)));
+    LBPbest(4) = unique(min(min(resultsLBP_pyramid)));
 
     bestTable = find(min(LBPbest));
 
@@ -30,16 +30,52 @@ function HybridMAE = Hybrid_LBP_HOG_BSIFT_Pyramid(faces, newfaces, ...
     minHOG = min(min(resultsHOG));
     [HOGcells, HOGnBinds] = find(resultsHOG == minHOG(1));
 
+    BSIFbest = zeros(1,3);
+    
+    BSIFbest(1) = min(min(min(resultsBSIF)),min(min(resultsBSIF2)));
+    BSIFbest(2) = min(min(min(resultsBSIF_half)), min(min(resultsBSIF2_half)));
+    BSIFbest(3) = min(min(min(resultsBSIF_quart)), min(min(resultsBSIF2_quart)));
 
-    %%%%%%%%% TO BE DONE ALL THE OPTIONS WITH BSIF %%%%%%%%%%%%%%%%%%
-
-    minBSIF = min(min(resultsBSIF));
-    minBSIF2 = min(resultsBSIF2);
-    if (minBSIF<minBSIF2)
-        [BSIFfSize, BSIFbits] = find(resultsBSIF == minBSIF(1));
-    else
-        BSIFfSize = 3;
-        BSIFbits = find(resultsBSIF2 == minBSIF2(1));
+    bestTable = find(min(BSIFbest));
+    
+    switch (bestTable)
+        case 1
+            minBSIF = min(min(resultsBSIF));
+            minBSIF2 = min(min(resultsBSIF2));
+            if (minBSIF(1)<minBSIF2(1))
+                [BSIFfSize, BSIFbits] = find(resultsBSIF == minBSIF(1));
+            else
+                BSIFfSize = 3;
+                BSIFbits = find(resultsBSIF2 == minBSIF2(1));
+            end
+        case 2
+            minBSIF = min(min(resultsBSIF_half));
+            minBSIF2 = min(min(resultsBSIF2_half));
+            if (minBSIF<minBSIF2)
+                [BSIFfSize, BSIFbits] = find(resultsBSIF_half == minBSIF(1));
+            else
+                BSIFfSize = 3;
+                BSIFbits = find(resultsBSIF2_half == minBSIF2(1));
+            end
+        case 3
+            minBSIF = min(min(resultsBSIF_quart));
+            minBSIF2 = min(min(resultsBSIF2_quart));
+            if (minBSIF<minBSIF2)
+                [BSIFfSize, BSIFbits] = find(resultsBSIF_quart == minBSIF(1));
+            else
+                BSIFfSize = 3;
+                BSIFbits = find(resultsBSIF2_quart == minBSIF2(1));
+            end
+            
+        otherwise
+            minBSIF = min(min(resultsBSIF));
+            minBSIF2 = min(min(resultsBSIF2));
+            if (minBSIF(1)<minBSIF2(1))
+                [BSIFfSize, BSIFbits] = find(resultsBSIF == minBSIF(1));
+            else
+                BSIFfSize = 3;
+                BSIFbits = find(resultsBSIF2 == minBSIF2(1));
+            end
     end
     
     LBPnNeighs = LBPnNeighs(1);
