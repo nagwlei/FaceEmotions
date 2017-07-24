@@ -101,7 +101,10 @@ function HybridMAE = Hybrid_LBP_HOG_BSIFT_Pyramid(faces, newfaces, ...
             
         % Extract best LBP features
         newLBPradius = (LBPradiusStart + LBPradius) - 1;
-        newLBPnNeighs = 2^(LBPnNeighStart + LBPnNeighs-1);
+        %newLBPnNeighs = 2^(LBPnNeighStart + LBPnNeighs-1);
+        newLBPnNeighs = 2^(LBPnNeighs);
+        
+        % We sppose it always starts in 2 LBPnNeighStart
         LBPfeatures = extractLBPFeatures(img, 'Upright',false, ...
             'CellSize', [16 16], 'NumNeighbors', ...
             newLBPnNeighs,'Radius',newLBPradius);
