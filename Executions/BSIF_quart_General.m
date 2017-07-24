@@ -7,6 +7,7 @@
 
 % Inputs:   
 % -faces: Structure containing the emotion, etnicity, id etc.
+% -newfaces: structure containing the half and the quarter images
 % -images: Structure containing the images in .data(:,:,:,j) and the labels
 %   of the images in .labels
 % -fSizeStart: Start of the sizes size
@@ -21,8 +22,8 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function myMatrixBSIF = BSIF_General(faces, images, fSizeStart, fSizeEnd, ...
-    bitStart, bitEnd, CVO)
+function myMatrixBSIF = BSIF_quart_General(faces, newfaces, images, ...
+    fSizeStart, fSizeEnd, bitStart, bitEnd, CVO)
     fSize = fSizeStart;
     bits = bitStart;
 
@@ -36,20 +37,31 @@ function myMatrixBSIF = BSIF_General(faces, images, fSizeStart, fSizeEnd, ...
                 if (length(size(images.data))>3)
                     aux = images.data(:,:,:,i);
                     img = rgb2gray(uint8(aux));
+                    half = rgb2gray(uint8(newfaces{i}.half));
+                    quart = rgb2gray(uint8(newfaces{i}.quarter));
                 else
                     aux = images.data(:,:,i);
                     img = uint8(aux);
+                    half = uint8(newfaces{i}.half);
+                    quart = uint8(newfaces{i}.quarter);
                 end
                 
                 % Extract BSIF features
                 f = filesep;
                 ICAtextureFiltersdir = strcat('bsif_code_and_data', f, ...
                     'texturefilters', f, 'ICAtextureFilters_', ...
-                    num2str(fSize), 'x', num2str(fSize), '_', num2str(bits), 'bit');
+                    num2str(fSize), 'x', num2str(fSize), '_', ...
+                    num2str(bits), 'bit');
                 
                 % normalized BSIF code word histogram
                 load(ICAtextureFiltersdir);
-                faces{i}.BSIF = bsif(double(img), ICAtextureFilters,'nh');
+                
+                bsifimg = bsif(double(img), ICAtextureFilters,'nh');
+                
+                bsifhalfimg = bsif(double(half), ICAtextureFilters,'nh');
+                 
+                bsifquartimg = bsif(double(quart), ICAtextureFilters,'nh');
+                faces{i}.BSIF = horzcat(bsifimg, bsifhalfimg, bsifquartimg);
             end;
 
             disp(strcat('FILTERS      fSize:     ', num2str(fSize), 'x', ...

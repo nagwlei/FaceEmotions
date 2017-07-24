@@ -18,7 +18,8 @@ function LBParray = LBP_of_pyramid(pyramid, LBPx, LBPy)
         for j=1:(length(pyramid{i})^2)
             % Obtain the LBP features of each image and concat it to output
             % array
-            LBPfeat = extractLBPFeatures(pyramid{i}{j},'Upright',false, 'CellSize', [16 16], 'NumNeighbors',LBPx,'Radius',LBPy);
+            LBPfeat = extractLBPFeatures(pyramid{i}{j},'Upright',false, ...
+                'CellSize', [16 16], 'NumNeighbors',LBPx,'Radius',LBPy);
             LBParray = horzcat(LBParray, LBPfeat);
         end;
     end;

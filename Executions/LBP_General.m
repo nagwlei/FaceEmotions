@@ -4,10 +4,10 @@
 % -images: Structure containing the images in .data(:,:,:,j) and the labels
 %   of the images in .labels
 % -nneighStart: Start of the number of neighbours for the table
-% -nneighEnd: End of the number of neighbours for the table
+% -nneighEnd: End of the number of neighbours for the table  (and each of 
+%   the neighbours will be calculated as a ^2)
 % -rStart: Start of radius for the table
-% -rEnd: End of radius for the table (and each of the radius will be 
-%   calculated as a ^2)
+% -rEnd: End of radius for the table
 % -CVO: The partitions for test and train
 
 % Output:
@@ -25,10 +25,24 @@ function myMatrixLBP = LBP_General(faces, images, nneighStart, nneighEnd, rStart
         for zy = 1:((nneighEnd - nneighStart)+1)
             % Extract LBP features
             for i=1:length(faces)
-                img = images.data(:,:,:,i);
-                % Extract LBP features
-                faces{i}.LBP = extractLBPFeatures(rgb2gray(uint8(img)),'Upright',false, ...
-                    'CellSize', [16 16], 'NumNeighbors',nneighbours,'Radius',radius);
+                if (length(size(images.data))>3)
+                    % Color image
+                    img = images.data(:,:,:,i);
+                    
+                    % Extract LBP features
+                    faces{i}.LBP = extractLBPFeatures(rgb2gray(uint8(img)), ...
+                        'Upright',false, 'CellSize', [16 16], ...
+                        'NumNeighbors',nneighbours,'Radius',radius);
+                else
+                    % Grayscale image
+                    img = images.data(:,:,i);
+                    
+                    % Extract LBP features
+                    faces{i}.LBP = extractLBPFeatures(uint8(img), ...
+                        'Upright',false, 'CellSize', [16 16], ...
+                        'NumNeighbors',nneighbours,'Radius',radius);
+                end
+                
             end;
             
             disp(strcat('LBP          nNeighbours: ', int2str(nneighbours), ...

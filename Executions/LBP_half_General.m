@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Inputs:
 % -faces: Structure containing the emotion, etnicity, id etc.
-% -newfaces: structure containing the half and the quarter iamges
+% -newfaces: structure containing the half and the quarter images
 % -images: Structure containing the images in .data(:,:,:,j) and the labels
 %   of the images in .labels
 % -nneighStart: Start of the number of neighbours for the table
@@ -29,13 +29,24 @@ function myMatrixLBPhalf = LBP_half_General(faces, newfaces, images, nneighStart
             for i=1:length(faces)
                 %i;
                 % Obtain selected image
-                img = images.data(:,:,:,i);
+                if (length(size(images.data))>3)
+                    aux = images.data(:,:,:,i);
+                    img = rgb2gray(uint8(aux));
+                    half = rgb2gray(uint8(newfaces{i}.half));
+                else
+                    aux = images.data(:,:,i);
+                    img = uint8(aux);
+                    half = uint8(newfaces{i}.half);
+                end
+                
                 % Extract LBP features
-                lbpimg = extractLBPFeatures(rgb2gray(uint8(img)),'Upright',false, ...
-                    'CellSize', [16 16], 'NumNeighbors',nneighbours,'Radius',radius);
-                half = newfaces{i}.half;
-                lbphalfimg = extractLBPFeatures(rgb2gray(uint8(half)),'Upright',false, ...
-                    'CellSize', [16 16], 'NumNeighbors',nneighbours,'Radius',radius);
+                lbpimg = extractLBPFeatures(img,'Upright',false, ...
+                    'CellSize', [16 16], 'NumNeighbors',nneighbours, ...
+                    'Radius',radius);
+                
+                lbphalfimg = extractLBPFeatures(half,'Upright',false, ...
+                    'CellSize', [16 16], 'NumNeighbors',nneighbours, ...
+                    'Radius',radius);
                 finallbp = horzcat(lbpimg, lbphalfimg);
                 faces{i}.LBP = finallbp;
             end;

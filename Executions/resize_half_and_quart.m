@@ -9,10 +9,16 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function newfaces = resize_half_and_quart(faces, images)
-    newfaces = cell(1, 1192);
+    newfaces = cell(1, length(faces));
     for i=1:length(faces)
         %i
-        img = images.data(:,:,:,i);
+        if (length(size(images.data))>3)
+            % Color image
+            img = images.data(:,:,:,i);
+        else
+            % Grayscale image
+            img = images.data(:,:,i);
+        end
         half = imresize(img, 0.5);
         quart = imresize(img, 0.25);
         newfaces{i}.half = half;

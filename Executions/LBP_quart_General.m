@@ -29,13 +29,30 @@ function myMatrixLBPquart = LBP_quart_General(faces, newfaces, images, nneighSta
             for i=1:length(faces)
                 %i;
                 % Obtain selected image
-                img = images.data(:,:,:,i);
+                if (length(size(images.data))>3)
+                    aux = images.data(:,:,:,i);
+                    img = rgb2gray(uint8(aux));
+                    half = rgb2gray(uint8(newfaces{i}.half));
+                    quart = rgb2gray(uint8(newfaces{i}.quarter));
+                else
+                    aux = images.data(:,:,i);
+                    img = uint8(aux);
+                    half = uint8(newfaces{i}.half);
+                    quart = uint8(newfaces{i}.quarter);
+                end
+                
                 % Extract LBP features
-                lbpimg = extractLBPFeatures(rgb2gray(uint8(img)),'Upright',false, 'CellSize', [16 16], 'NumNeighbors',nneighbours,'Radius',radius);
-                half = newfaces{i}.half;
-                lbphalfimg = extractLBPFeatures(rgb2gray(uint8(half)),'Upright',false, 'CellSize', [16 16], 'NumNeighbors',nneighbours,'Radius',radius);
-                quart = newfaces{i}.quarter;
-                lbpquartimg = extractLBPFeatures(rgb2gray(uint8(quart)),'Upright',false, 'CellSize', [16 16], 'NumNeighbors',nneighbours,'Radius',radius);
+                lbpimg = extractLBPFeatures(img,'Upright',false, ...
+                    'CellSize', [16 16], 'NumNeighbors', ...
+                    nneighbours,'Radius',radius);
+                
+                lbphalfimg = extractLBPFeatures(half,'Upright',false, ...
+                    'CellSize', [16 16], 'NumNeighbors',nneighbours, ...
+                    'Radius',radius);
+                
+                lbpquartimg = extractLBPFeatures(quart,'Upright',false, ...
+                    'CellSize', [16 16], 'NumNeighbors',nneighbours, ...
+                    'Radius',radius);
                 finallbp = horzcat(lbpimg, lbphalfimg, lbpquartimg);
                 faces{i}.LBP = finallbp;
             end;

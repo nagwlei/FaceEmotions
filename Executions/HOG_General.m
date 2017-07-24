@@ -27,9 +27,18 @@ function myMatrixHOG = HOG_General(faces, images, cellStart, cellEnd, nBinsStart
             for i=1:length(faces)
                 %i;
                 % Obtain selected image
-                img = images.data(:,:,:,i);
+                if (length(size(images.data))>3)
+                    % Color images
+                    img = images.data(:,:,:,i);
+                else
+                    % Grayscale images
+                    img = images.data(:,:,i);
+                end
+                
                 % Extract HOG features
-                [featureVector,hogVisualization] = extractHOGFeatures(img, 'CellSize', [cellSize cellSize], 'NumBins', nBins);
+                [featureVector,hogVisualization] = ...
+                    extractHOGFeatures(img, 'CellSize', [cellSize cellSize], ...
+                    'NumBins', nBins);
                 faces{i}.HOG = featureVector;
             end;
             
