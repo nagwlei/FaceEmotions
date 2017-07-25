@@ -32,16 +32,16 @@ function HybridMAE = Hybrid_LBP_HOG_BSIFT_Pyramid(faces, newfaces, ...
 
     BSIFbest = zeros(1,3);
     
-    BSIFbest(1) = min(min(min(resultsBSIF)),min(min(resultsBSIF2)));
-    BSIFbest(2) = min(min(min(resultsBSIF_half)), min(min(resultsBSIF2_half)));
-    BSIFbest(3) = min(min(min(resultsBSIF_quart)), min(min(resultsBSIF2_quart)));
+    BSIFbest(1) = unique(min(min(min(resultsBSIF)),min(min(resultsBSIF2))));
+    BSIFbest(2) = unique(min(min(min(resultsBSIF_half)), min(min(resultsBSIF2_half))));
+    BSIFbest(3) = unique(min(min(min(resultsBSIF_quart)), min(min(resultsBSIF2_quart))));
 
     bestTable = find(min(BSIFbest));
     
     switch (bestTable)
         case 1
-            minBSIF = min(min(resultsBSIF));
-            minBSIF2 = min(min(resultsBSIF2));
+            minBSIF = unique(min(min(resultsBSIF)));
+            minBSIF2 = unique(min(min(resultsBSIF2)));
             if (minBSIF(1)<minBSIF2(1))
                 [BSIFfSize, BSIFbits] = find(resultsBSIF == minBSIF(1));
             else
@@ -49,8 +49,8 @@ function HybridMAE = Hybrid_LBP_HOG_BSIFT_Pyramid(faces, newfaces, ...
                 BSIFbits = find(resultsBSIF2 == minBSIF2(1));
             end
         case 2
-            minBSIF = min(min(resultsBSIF_half));
-            minBSIF2 = min(min(resultsBSIF2_half));
+            minBSIF = unique(min(min(resultsBSIF_half)));
+            minBSIF2 = unique(min(min(resultsBSIF2_half)));
             if (minBSIF<minBSIF2)
                 [BSIFfSize, BSIFbits] = find(resultsBSIF_half == minBSIF(1));
             else
@@ -58,8 +58,8 @@ function HybridMAE = Hybrid_LBP_HOG_BSIFT_Pyramid(faces, newfaces, ...
                 BSIFbits = find(resultsBSIF2_half == minBSIF2(1));
             end
         case 3
-            minBSIF = min(min(resultsBSIF_quart));
-            minBSIF2 = min(min(resultsBSIF2_quart));
+            minBSIF = unique(min(min(resultsBSIF_quart)));
+            minBSIF2 = unique(min(min(resultsBSIF2_quart)));
             if (minBSIF<minBSIF2)
                 [BSIFfSize, BSIFbits] = find(resultsBSIF_quart == minBSIF(1));
             else
@@ -68,8 +68,8 @@ function HybridMAE = Hybrid_LBP_HOG_BSIFT_Pyramid(faces, newfaces, ...
             end
             
         otherwise
-            minBSIF = min(min(resultsBSIF));
-            minBSIF2 = min(min(resultsBSIF2));
+            minBSIF = unique(min(min(resultsBSIF)));
+            minBSIF2 = unique(min(min(resultsBSIF2)));
             if (minBSIF(1)<minBSIF2(1))
                 [BSIFfSize, BSIFbits] = find(resultsBSIF == minBSIF(1));
             else
@@ -78,14 +78,14 @@ function HybridMAE = Hybrid_LBP_HOG_BSIFT_Pyramid(faces, newfaces, ...
             end
     end
     
-    LBPnNeighs = LBPnNeighs(1);
-    LBPradius = LBPradius(1);
+    LBPnNeighs = unique(LBPnNeighs);
+    LBPradius = unique(LBPradius);
     
-    HOGcells = HOGcells(1);
-    HOGnBinds = HOGnBinds(1);
+    HOGcells = unique(HOGcells);
+    HOGnBinds = unique(HOGnBinds);
     
-    BSIFfSize = BSIFfSize(1);
-    BSIFbits = BSIFbits(1);
+    BSIFfSize = unique(BSIFfSize);
+    BSIFbits = unique(BSIFbits);
     
     % Go through all the images
     for i=1:length(faces)
