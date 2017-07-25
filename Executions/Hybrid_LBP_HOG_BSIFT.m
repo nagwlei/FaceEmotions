@@ -4,27 +4,27 @@ function HybridMAE = Hybrid_LBP_HOG_BSIFT(faces, images, resultsLBP, ...
     LBPnNeighStart, LBPradiusStart, resultsHOG, HOGcellsStart, HOGnBindsStart, ...
     BSIFfSizeStart,BSIFbitsStart, resultsBSIF, resultsBSIF2, CVO)
 
-    minLBP = min(min(resultsLBP));
-    [LBPnNeighs, LBPradius] = find(resultsLBP == minLBP(1));
-    minHOG = min(min(resultsHOG));
-    [HOGcells, HOGnBinds] = find(resultsHOG == minHOG(1));
-    minBSIF = min(min(resultsBSIF));
-    minBSIF2 = min(resultsBSIF2);
+    minLBP = unique(min(min(resultsLBP)));
+    [LBPnNeighs, LBPradius] = find(resultsLBP == minLBP);
+    minHOG = unique(min(min(resultsHOG)));
+    [HOGcells, HOGnBinds] = find(resultsHOG == minHOG);
+    minBSIF = unique(min(min(resultsBSIF)));
+    minBSIF2 = unique(min(resultsBSIF2));
     if (minBSIF<minBSIF2)
-        [BSIFfSize, BSIFbits] = find(resultsBSIF == minBSIF(1));
+        [BSIFfSize, BSIFbits] = find(resultsBSIF == minBSIF);
     else
         BSIFfSize = 3;
-        BSIFbits = find(resultsBSIF2 == minBSIF2(1));
+        BSIFbits = find(resultsBSIF2 == minBSIF2);
     end
     
-    LBPnNeighs = LBPnNeighs(1);
-    LBPradius = LBPradius(1);
+    LBPnNeighs = unique(LBPnNeighs);
+    LBPradius = unique(LBPradius);
     
-    HOGcells = HOGcells(1);
-    HOGnBinds = HOGnBinds(1);
+    HOGcells = unique(HOGcells);
+    HOGnBinds = unique(HOGnBinds);
     
-    BSIFfSize = BSIFfSize(1);
-    BSIFbits = BSIFbits(1);
+    BSIFfSize = unique(BSIFfSize);
+    BSIFbits = unique(BSIFbits);
     
     % Go through all the images
     for i=1:length(faces)
