@@ -7,10 +7,14 @@ function HybridMAE = Hybrid_LBP_HOG_BSIFT_Pyramid(faces, newfaces, ...
 
     LBPbest = zeros(1, 4);
     
-    LBPbest(1) = unique(min(min(resultsLBP)));
-    LBPbest(2) = unique(min(min(resultsLBP_half)));
-    LBPbest(3) = unique(min(min(resultsLBP_quart)));
-    LBPbest(4) = unique(min(min(resultsLBP_pyramid)));
+    aux = min(min(resultsLBP));
+    LBPbest(1) = aux(1);
+    aux2 = min(min(resultsLBP_half));
+    LBPbest(2) = aux2(1);
+    aux3 = min(min(resultsLBP_quart));
+    LBPbest(3) = aux3(1);
+    aux4 = min(min(resultsLBP_pyramid));
+    LBPbest(4) = aux4(1);
 
     bestTable = find(min(LBPbest));
 
@@ -32,60 +36,79 @@ function HybridMAE = Hybrid_LBP_HOG_BSIFT_Pyramid(faces, newfaces, ...
 
     BSIFbest = zeros(1,3);
     
-    BSIFbest(1) = unique(min(min(min(resultsBSIF)),min(min(resultsBSIF2))));
-    BSIFbest(2) = unique(min(min(min(resultsBSIF_half)), min(min(resultsBSIF2_half))));
-    BSIFbest(3) = unique(min(min(min(resultsBSIF_quart)), min(min(resultsBSIF2_quart))));
+    aux = min(min(min(resultsBSIF)),min(min(resultsBSIF2)));
+    BSIFbest(1) = aux(1);
+    aux2 = min(min(min(resultsBSIF_half)), min(min(resultsBSIF2_half)));
+    BSIFbest(2) = aux2(1);
+    aux3 = min(min(min(resultsBSIF_quart)), min(min(resultsBSIF2_quart)));
+    BSIFbest(3) = aux3(1);
 
     bestTable = find(min(BSIFbest));
     
     switch (bestTable)
         case 1
-            minBSIF = unique(min(min(resultsBSIF)));
-            minBSIF2 = unique(min(min(resultsBSIF2)));
+            aux = min(min(resultsBSIF));
+            minBSIF = aux(1);
+            aux2 = min(min(resultsBSIF2));
+            minBSIF2 = aux2(1);
             if (minBSIF(1)<minBSIF2(1))
                 [BSIFfSize, BSIFbits] = find(resultsBSIF == minBSIF(1));
-            else
-                BSIFfSize = 3;
-                BSIFbits = find(resultsBSIF2 == minBSIF2(1));
+                %fprintf('CASE 1: IF       BSIFfSize: %d     BSIFbits: %d', BSIFfSize, BSIFbits);
+            else   
+                [BSIFfSize, ~] = find(resultsBSIF2 == minBSIF2(1));
+                BSIFbits = 3;
+                %fprintf('CASE 1: ELSE       BSIFfSize: %d     BSIFbits: %d', BSIFfSize, BSIFbits);
             end
         case 2
-            minBSIF = unique(min(min(resultsBSIF_half)));
-            minBSIF2 = unique(min(min(resultsBSIF2_half)));
+            aux = min(min(resultsBSIF_half));
+            minBSIF = aux(1);
+            aux2 = min(min(resultsBSIF2_half));
+            minBSIF2 = aux2(1);
             if (minBSIF<minBSIF2)
                 [BSIFfSize, BSIFbits] = find(resultsBSIF_half == minBSIF(1));
+                %fprintf('CASE 1: IF       BSIFfSize: %d     BSIFbits: %d', BSIFfSize, BSIFbits);
             else
-                BSIFfSize = 3;
-                BSIFbits = find(resultsBSIF2_half == minBSIF2(1));
+                [BSIFfSize, ~] = find(resultsBSIF2_half == minBSIF2(1));
+                BSIFbits = 3;  
+                %fprintf('CASE 1: ELSE       BSIFfSize: %d     BSIFbits: %d', BSIFfSize, BSIFbits);
             end
         case 3
-            minBSIF = unique(min(min(resultsBSIF_quart)));
-            minBSIF2 = unique(min(min(resultsBSIF2_quart)));
+            aux = min(min(resultsBSIF_quart));
+            minBSIF = aux(1);
+            aux2 = min(min(resultsBSIF2_quart));
+            minBSIF2 = aux2(1);
             if (minBSIF<minBSIF2)
                 [BSIFfSize, BSIFbits] = find(resultsBSIF_quart == minBSIF(1));
+                %fprintf('CASE 1: IF       BSIFfSize: %d     BSIFbits: %d', BSIFfSize, BSIFbits);
             else
-                BSIFfSize = 3;
-                BSIFbits = find(resultsBSIF2_quart == minBSIF2(1));
+                [BSIFfSize, ~] = find(resultsBSIF2_quart == minBSIF2(1));
+                BSIFbits = 3;
+                %fprintf('CASE 1: ELSE       BSIFfSize: %d     BSIFbits: %d', BSIFfSize, BSIFbits);
             end
             
         otherwise
-            minBSIF = unique(min(min(resultsBSIF)));
-            minBSIF2 = unique(min(min(resultsBSIF2)));
+            aux = min(min(resultsBSIF));
+            minBSIF = aux(1);
+            aux2 = min(min(resultsBSIF2));
+            minBSIF2 = aux2(1);
             if (minBSIF(1)<minBSIF2(1))
                 [BSIFfSize, BSIFbits] = find(resultsBSIF == minBSIF(1));
+                %fprintf('CASE 1: IF       BSIFfSize: %d     BSIFbits: %d', BSIFfSize, BSIFbits);
             else
-                BSIFfSize = 3;
-                BSIFbits = find(resultsBSIF2 == minBSIF2(1));
+                [BSIFfSize, ~] = find(resultsBSIF2 == minBSIF2(1));
+                BSIFbits = 3;
+                %fprintf('CASE 1: ELSE       BSIFfSize: %d     BSIFbits: %d', BSIFfSize, BSIFbits);
             end
     end
     
-    LBPnNeighs = unique(LBPnNeighs);
-    LBPradius = unique(LBPradius);
+    LBPnNeighs = LBPnNeighs(1);
+    LBPradius = LBPradius(1);
     
-    HOGcells = unique(HOGcells);
-    HOGnBinds = unique(HOGnBinds);
+    HOGcells = HOGcells(1);
+    HOGnBinds = HOGnBinds(1);
     
-    BSIFfSize = unique(BSIFfSize);
-    BSIFbits = unique(BSIFbits);
+    BSIFfSize = BSIFfSize(1);
+    BSIFbits = BSIFbits(1);
     
     % Go through all the images
     for i=1:length(faces)
