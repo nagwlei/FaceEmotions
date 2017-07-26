@@ -4,27 +4,41 @@ function HybridMAE = Hybrid_LBP_HOG_BSIFT(faces, images, resultsLBP, ...
     LBPnNeighStart, LBPradiusStart, resultsHOG, HOGcellsStart, HOGnBindsStart, ...
     BSIFfSizeStart,BSIFbitsStart, resultsBSIF, resultsBSIF2, CVO)
 
-    minLBP = unique(min(min(resultsLBP)));
+    minLBP = min(min(resultsLBP));
+    minLBP = minLBP(1);
     [LBPnNeighs, LBPradius] = find(resultsLBP == minLBP);
-    minHOG = unique(min(min(resultsHOG)));
+    fprintf('LBPnNeighs: %d,      LBPradius: %d\n', LBPnNeighs, LBPradius);
+    
+    minHOG = min(min(resultsHOG));
+    minHOG = minHOG(1);
     [HOGcells, HOGnBinds] = find(resultsHOG == minHOG);
-    minBSIF = unique(min(min(resultsBSIF)));
-    minBSIF2 = unique(min(resultsBSIF2));
+    fprintf('HOGcells: %d,     HOGnBinds: %d\n', HOGcells, HOGnBinds);
+    minBSIF = min(min(resultsBSIF));
+    minBSIF = minBSIF(1);
+    minBSIF2 = min(resultsBSIF2);
+    minBSIF2 = minBSIF2(1);
     if (minBSIF<minBSIF2)
-        [BSIFfSize, BSIFbits] = find(resultsBSIF == minBSIF);
+        %fprintf('       IF %d<%d', minBSIF, minBSIF2);
+        [BSIFfSize, BSIFbits] = find(resultsBSIF == minBSIF(1));
+        %fprintf('       INSIDE IF BSIFfSize: %d     BSIFbits: %d', BSIFfSize, BSIFbits);
+        
     else
-        BSIFfSize = 3;
-        BSIFbits = find(resultsBSIF2 == minBSIF2);
+        %fprintf('      ELSE NOT %d<%d\n', minBSIF, minBSIF2);
+        BSIFfSize = find(resultsBSIF2 == minBSIF2(1));
+        BSIFbits = 3;
+        
+        %fprintf('     INSIDE ELSE BSIFfSize: %d     BSIFbits: %d\n', BSIFfSize, BSIFbits);
     end
+    fprintf('BSIFfSize: %d     BSIFbits: %d\n', BSIFfSize, BSIFbits);
     
-    LBPnNeighs = unique(LBPnNeighs);
-    LBPradius = unique(LBPradius);
+    LBPnNeighs = LBPnNeighs(1);
+    LBPradius = LBPradius(1);
     
-    HOGcells = unique(HOGcells);
-    HOGnBinds = unique(HOGnBinds);
+    HOGcells = HOGcells(1);
+    HOGnBinds = HOGnBinds(1);
     
-    BSIFfSize = unique(BSIFfSize);
-    BSIFbits = unique(BSIFbits);
+    BSIFfSize = BSIFfSize(1);
+    BSIFbits = BSIFbits(1);
     
     % Go through all the images
     for i=1:length(faces)
