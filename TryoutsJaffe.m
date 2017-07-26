@@ -20,12 +20,29 @@ nfolds = 10;
 if (~exist('CVOjaffe'))
     mapObj = containers.Map({'KA', 'KL', 'KM', 'KR', 'MK', 'NA','NM', ...
         'TM', 'UY', 'YM'}, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
-    names = zeros(1, length( facesjaffe ) );
-    for kk=1:length(facesjaffe)
-        names(kk) = mapObj(facesjaffe{kk}.id);
-    end
+
+    CVOjaffe.NumTestSets = nfolds;
+    CVOjaffe.training = cell(1, nfolds);
+    CVOjaffe.test = cell(1, nfolds);
+    CVOjaffe.TrainSize = zeros(1, nfolds);
+    CVOjaffe.TestSize = zeros(1, nfolds);
+    CVOjaffe.NumObservations = length(facesjaffe);
     
-    CVOjaffe = cvpartition(names, 'k', nfolds);
+    theIds = keys(mapObj)
+
+    classesIndexes = zeros(1, length(facesjaffe));
+
+    for kk=1:nfolds
+        kk
+        aux = theIds(kk);
+        ispresent = cellfun(@(s) ~isempty(strfind(aux{1}, s.id)), facesjaffe);
+
+        %foldIndexes{1,kk} = ispresent;
+        CVOjaffe.TestSize(kk) = sum(ispresent);
+        CVOjaffe.test{kk} = ispresent;
+        CVOjaffe.TrainSize(kk) = sum(~CVOjaffe.test{kk});
+        CVOjaffe.training{kk} = ~CVOjaffe.test{kk};
+    end;
 end
 
 % HOG
@@ -80,7 +97,7 @@ HybridMAE_concat = Hybrid_LBP_HOG_BSIFT_Pyramid(facesjaffe, newfacesjaffe, ...
     myMatrixLBPPyramidjaffe, 2, 2, myMatrixHOGjaffe, ...
     6, 6, 5, ...
     myMatrixBSIFjaffe, myMatrixBSIF2jaffe, myMatrixBSIF_halfjaffe, myMatrixBSIF_half2jaffe, ...
-    myMatrixBSIF_quartjaffe, myMatrixBSIF_quart2jaffe, CVOjaffe)
+    myMatrixBSIF_quartjaffe, myMatrixBSIF_quart2jaffe, CVOjaffe);
 
 % Save results in a 'oridbresults.mat'
 save('oriJAFFEresults.mat', 'CVOjaffe', 'myMatrixHOGjaffe', ...
