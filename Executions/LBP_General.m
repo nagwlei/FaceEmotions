@@ -54,6 +54,14 @@ function myMatrixLBP = LBP_General(faces, images, nneighStart, nneighEnd, rStart
                 trIdx = CVO.training(i);
                 teIdx = CVO.test(i);
                 
+                % This is necessary to work with the CVO created for JAFFE
+                if (strcmp(class(trIdx), 'cell'))
+                   trIdx = trIdx{1}; 
+                end
+                if (strcmp(class(teIdx), 'cell'))
+                    teIdx = teIdx{1};
+                end
+                
                 TrLBP = zeros(sum(trIdx), length(faces{1}.LBP));
                 TeLBP = zeros(sum(teIdx), length(faces{1}.LBP));
 

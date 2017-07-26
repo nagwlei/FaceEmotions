@@ -57,6 +57,14 @@ function myMatrixLBPPyramid = LBP_of_pyramid_General(nlevels, blocksize, ...
                 trIdx = CVO.training(i);
                 teIdx = CVO.test(i);
                 
+                 % This is necessary to work with the CVO created for JAFFE
+                if (strcmp(class(trIdx), 'cell'))
+                   trIdx = trIdx{1}; 
+                end
+                if (strcmp(class(teIdx), 'cell'))
+                    teIdx = teIdx{1};
+                end
+                
                 TrLBP = zeros(sum(trIdx), length(myfaces{1}.LBP));
                 TeLBP = zeros(sum(teIdx), length(myfaces{1}.LBP));
                 
