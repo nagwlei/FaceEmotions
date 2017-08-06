@@ -12,12 +12,47 @@ addpath('Pyramid');
 addpath('bsif_code_and_data');
 addpath(strcat('bsif_code_and_data', f, 'texturefilters'));
 
-% N folds = Number of different people in the db
-nfolds = 10;
-
 %% Execution with original CKplus db images
 if (~exist('CVOcentCKplus'))
-   CVOcentCKplus = cvpartition(centCKplusimgs.labels, 'k', nfolds);
+   %CVOcentCKplus = cvpartition(centCKplusimgs.labels, 'k', nfolds);
+   
+   x = cell(1, length(centfacesCKplus));
+   
+   for kk=1:length(centfacesCKplus)
+      x{1,kk} = centfacesCKplus{1,kk}.id; 
+   end
+   
+   keys = unique(x);
+   
+   values = cell(1, length(keys));
+   for kk = 1:length(keys)
+       values{kk} = kk;
+   end
+   
+   mapObj = containers.Map(keys, values);
+   
+   % N folds = Number of different people in the db
+    nfolds = length(values);
+    
+    CVOcentCKplus.NumTestSets = nfolds;
+    CVOcentCKplus.training = cell(1, nfolds);
+    CVOcentCKplus.test = cell(1, nfolds);
+    CVOcentCKplus.TrainSize = zeros(1, nfolds);
+    CVOcentCKplus.TestSize = zeros(1, nfolds);
+    CVOcentCKplus.NumObservations = length(centfacesCKplus);
+    
+    for kk=1:nfolds
+        kk
+        aux = keys(kk);
+        ispresent = cellfun(@(s) ~isempty(strfind(aux{1}, s.id)), ...
+            centfacesCKplus);
+        
+        CVOcentCKplus.TestSize(kk) = sum(ispresent);
+        CVOcentCKplus.test{kk} = ispresent;
+        CVOcentCKplus.TrainSize(kk) = sum(~CVOcentCKplus.test{kk});
+        CVOcentCKplus.training{kk} = ~CVOcentCKplus.test{kk};
+    end
+   
 end
 
 % HOG
