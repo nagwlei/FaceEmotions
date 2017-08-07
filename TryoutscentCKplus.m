@@ -7,6 +7,9 @@ run matlab/vl_setupnn
 f = filesep;
 load(strcat('ImageData', f, 'centCKplusimdb.mat'));
 
+% N folds = Number of different people in the db
+nfolds = 10;
+
 addpath('Executions');
 addpath('Pyramid');
 addpath('bsif_code_and_data');
@@ -31,8 +34,7 @@ if (~exist('CVOcentCKplus'))
    
    mapObj = containers.Map(keys, values);
    
-   % N folds = Number of different people in the db
-    nfolds = length(values);
+   
     
     CVOcentCKplus.NumTestSets = nfolds;
     CVOcentCKplus.training = cell(1, nfolds);
@@ -41,14 +43,29 @@ if (~exist('CVOcentCKplus'))
     CVOcentCKplus.TestSize = zeros(1, nfolds);
     CVOcentCKplus.NumObservations = length(centfacesCKplus);
     
+    generalI = 0;
+    
+    selectedPeople = logical(zeros(1, length(centfacesCKplus)));
+    
     for kk=1:nfolds
         kk
-        aux = keys(kk);
-        ispresent = cellfun(@(s) ~isempty(strfind(aux{1}, s.id)), ...
-            centfacesCKplus);
+        selectedPeople = logical(zeros(1, length(centfacesCKplus)));
+        if (kk<3)
+            lastPerson = 11;
+        else
+            lastPerson = 12;
+        end
         
-        CVOcentCKplus.TestSize(kk) = sum(ispresent);
-        CVOcentCKplus.test{kk} = ispresent;
+        for i=1:lastPerson
+            generalI = generalI + 1;
+            aux = keys{generalI};
+            ispresent = cellfun(@(s) ~isempty(strfind(aux, s.id)), ...
+            centfacesCKplus);
+            selectedPeople = selectedPeople | ispresent;  
+        end
+        
+        CVOcentCKplus.TestSize(kk) = sum(selectedPeople);
+        CVOcentCKplus.test{kk} = selectedPeople;
         CVOcentCKplus.TrainSize(kk) = sum(~CVOcentCKplus.test{kk});
         CVOcentCKplus.training{kk} = ~CVOcentCKplus.test{kk};
     end
