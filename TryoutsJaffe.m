@@ -1,8 +1,8 @@
 
 % Compile MatConvNet (only once)
-run matlab/vl_compilenn
+%run matlab/vl_compilenn
 % setup MatConvNet
-run matlab/vl_setupnn
+%run matlab/vl_setupnn
 
 % Load image data
 f = filesep;
