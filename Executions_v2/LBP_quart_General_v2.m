@@ -93,7 +93,7 @@ function myArrayLBPquart = LBP_quart_General_v2(faces, newfaces, images, ...
             errLBP(i) = sum(ytestLBP~=images.labels(teIdx)');
         end;
 
-        myMatrixLBPquart(zy, zx) = sum(errLBP)/sum(CVO.TestSize);
+        myArrayLBPquart(1, zx) = sum(errLBP)/sum(CVO.TestSize);
 
         disp(strcat('MAE of       LBP:    ', sprintf('%f', myMatrixLBPquart(zy, zx))))
 
