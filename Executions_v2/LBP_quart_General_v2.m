@@ -13,7 +13,7 @@
 % -myArrayLBPquart: Array the MAE error
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function myArrayLBPquart = LBP_quart_General_v2(ffaces, newfaces, images, ...
+function myArrayLBPquart = LBP_quart_General_v2(faces, newfaces, images, ...
     cellSizeStart, cellSizeEnd, nneighbours, radius, CVO)
     
     cellSize = cellSizeStart;
