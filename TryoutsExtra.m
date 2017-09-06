@@ -243,6 +243,15 @@ HybridMAEcent_concat = Hybrid_LBP_HOG_BSIFT_Pyramid(faces, newfacescent, ...
 % LBP values changing cellSize from 10 to 25 (with fixed Radius and
 % Nneighs)
 % LBP values changing cellSize from 10 to 25
+f = filesep;
+oricafferesults = strcat('Results', f, 'oriCAFFEresults.mat');
+centfacesdb = strcat('ImageData', f, 'centimdb.mat');
+
+load(oricafferesults);
+load(centfacesdb);
+
+newfacescent = resize_half_and_quart(faces, centimages);
+
 extraArrayLBPCell10_25 = LBP_General_v2(faces, centimages, ...
     10, 25, 8, 1, CVO);
 extraArrayLBP_halfCell10_25 = LBP_half_General_v2(faces, newfacescent, ...
