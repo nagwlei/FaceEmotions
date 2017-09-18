@@ -1,6 +1,6 @@
 %% load image data existing JAFFE results (with CV object)
-if exist( 'oriJAFFEresults.mat', 'file') == 2
-    load oriJAFFEresults;
+if exist( './Results/oriJAFFEresults.mat', 'file') == 2
+    load ./Results/oriJAFFEresults;
 end
 
 % Load image data
@@ -40,17 +40,14 @@ if (~exist('CVOjaffe', 'var'))
 end
 
 %% get VGG features
-vggFace = 1;
-gpu = 1;
-if( vggFace )
-    facesjaffe = getMatConvNetFeatures('/home/iarganda/workspace/matconvnet/data/models/vgg-face.mat', gpu, facesjaffe, jaffeimgs);
-facesjaffe = getMatCaffeFeatures('/home/iarganda/workspace/caffe/models/EmotiW/','deploy.txt','EmotiW_VGG_S.caffemodel','/home/iarganda/workspace/caffe/models/EmotiW/mean.binaryproto', gpu, centfacesCKplus, centCKplusimgs);
 
+gpu = 1;
+facesjaffe = getMatCaffeFeatures('/home/iarganda/workspace/caffe/models/EmotiW/','deploy.txt','EmotiW_VGG_S.caffemodel','/home/iarganda/workspace/caffe/models/EmotiW/mean.binaryproto', gpu, facesjaffe, jaffeimgs);
 
 
 %% SVM learning
 MAEDeep = SVMDeepFeatures( CVOjaffe, facesjaffe, jaffeimgs );
-disp(strcat('MAE of deep features (original JAFFE images):    ', sprintf('%f', MAEDeep)))
+disp(strcat('MAE of deep Caffe features (original JAFFE images):    ', sprintf('%f', MAEDeep)))
 
 % Newline
 disp(' ')
